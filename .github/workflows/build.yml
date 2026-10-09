@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v1
+
+    - name: Restore Packages
+      run: nuget restore OptimizerNXT.sln
+
+    - name: Build Solution (Release)
+      run: msbuild.exe OptimizerNXT.sln -p:Configuration=Release -v:minimal -nologo
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: OptimizerNXT
+        path: bin/release/OptimizerNXT.exe
